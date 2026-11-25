@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>测测你的灵魂对应哪位中国历史人物</title>
+<style>
+:root{
+  --paper:#f6f1e6; --ink:#2e2a26; --red:#a23e32; --gold:#b98a3e;
+  --mist:#8c8477; --card:#fffdf7;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{
+  font-family:"Songti SC","Noto Serif SC","STSong",serif;
+  background:var(--paper); color:var(--ink); min-height:100vh;
+  background-image:radial-gradient(circle at 15% 10%,rgba(185,138,62,.08) 0,transparent 40%),
+                   radial-gradient(circle at 85% 90%,rgba(162,62,50,.07) 0,transparent 40%);
+}
+.wrap{max-width:560px;margin:0 auto;padding:24px 20px 60px;}
+.page{display:none;animation:fadeUp .5s ease both;}
+.page.show{display:block;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px);}to{opacity:1;transform:none;}}
+
+.home-title{margin-top:6vh;text-align:center;}
+.seal{
+  width:78px;height:78px;margin:0 auto 22px;border:3px solid var(--red);color:var(--red);
+  border-radius:10px;display:flex;align-items:center;justify-content:center;
+  font-size:30px;font-weight:bold;letter-spacing:2px;transform:rotate(-6deg);
+  background:rgba(162,62,50,.06);
+}
+h1{font-size:27px;line-height:1.55;letter-spacing:2px;}
+h1 em{font-style:normal;color:var(--red);border-bottom:2px solid var(--gold);padding-bottom:2px;}
+.home-sub{margin-top:18px;color:var(--mist);font-size:14px;line-height:2;text-align:center;}
+.btn{
+  display:block;width:100%;margin:36px auto 0;padding:15px;border:none;cursor:pointer;
+  font-family:inherit;font-size:17px;letter-spacing:6px;border-radius:6px;
+  background:var(--red);color:#fff;box-shadow:0 6px 18px rgba(162,62,50,.28);
+  transition:transform .15s,box-shadow .15s;
+}
+.btn:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(162,62,50,.35);}
+.btn.ghost{background:transparent;color:var(--red);border:1.5px solid var(--red);box-shadow:none;letter-spacing:3px;font-size:14px;width:auto;padding:10px 22px;margin:16px auto 0;}
+.note{margin-top:26px;font-size:12px;color:var(--mist);text-align:center;}
+
+.bar-outer{position:sticky;top:0;z-index:9;padding-top:14px;background:linear-gradient(var(--paper) 70%,transparent);}
+.bar{height:6px;background:rgba(0,0,0,.08);border-radius:3px;overflow:hidden;}
+.bar-in{height:100%;width:0;background:linear-gradient(90deg,var(--gold),var(--red));border-radius:3px;transition:width .4s ease;}
+.bar-text{font-size:12px;color:var(--mist);margin:8px 2px 0;}
+.qcard{background:var(--card);border:1px solid rgba(185,138,62,.25);border-radius:14px;
+  padding:28px 22px 22px;margin-top:18px;box-shadow:0 8px 24px rgba(60,45,20,.07);}
+.qnum{color:var(--gold);font-size:13px;letter-spacing:3px;}
+.qtext{font-size:19px;line-height:1.7;margin:12px 0 20px;letter-spacing:1px;}
+.opt{
+  display:block;width:100%;text-align:left;background:#fff;border:1.5px solid rgba(140,132,119,.3);
+  border-radius:10px;padding:14px 16px;margin-bottom:12px;cursor:pointer;font-family:inherit;
+  font-size:15px;line-height:1.6;color:var(--ink);transition:all .18s;
+}
+.opt:hover{border-color:var(--red);background:rgba(162,62,50,.05);transform:translateX(4px);}
+.opt.sel{border-color:var(--red);background:rgba(162,62,50,.08);}
+.opt.sel .tag{background:var(--red);color:#fff;border-color:var(--red);}
+.opt .tag{display:inline-block;width:22px;height:22px;line-height:22px;text-align:center;
+  border:1px solid var(--gold);color:var(--gold);border-radius:50%;font-size:12px;margin-right:10px;transition:all .18s;}
+.nav-row{display:flex;justify-content:space-between;margin-top:6px;}
+.mini{background:none;border:none;color:var(--mist);font-family:inherit;font-size:13px;cursor:pointer;padding:8px;}
+.mini:disabled{opacity:.3;cursor:default;}
+
+.result-card{
+  background:linear-gradient(160deg,#fffdf7 0%,#f9f2e0 100%);
+  border:2px solid var(--gold);border-radius:18px;padding:34px 26px;
+  box-shadow:0 14px 40px rgba(120,80,20,.15);position:relative;overflow:hidden;
+}
+.result-card::before{content:"";position:absolute;inset:8px;border:1px solid rgba(185,138,62,.4);border-radius:12px;pointer-events:none;}
+.r-label{text-align:center;color:var(--gold);font-size:13px;letter-spacing:5px;}
+.r-name{text-align:center;font-size:44px;letter-spacing:8px;color:var(--red);margin:14px 0 4px;font-weight:bold;}
+.r-role{text-align:center;color:var(--ink);font-size:15px;letter-spacing:3px;}
+.r-line{margin:22px auto 8px;text-align:center;font-size:16px;color:#5a4a2f;line-height:1.9;
+  border-top:1px dashed rgba(185,138,62,.5);border-bottom:1px dashed rgba(185,138,62,.5);padding:16px 8px;}
+.r-sub{text-align:center;color:var(--mist);font-size:13px;margin-top:12px;}
+.r-sub b{color:var(--gold);}
+.sec{margin-top:20px;}
+.sec h3{font-size:14px;letter-spacing:4px;color:var(--red);margin-bottom:8px;}
+.sec h3::before{content:"◆ ";color:var(--gold);font-size:10px;vertical-align:2px;}
+.sec p{font-size:14px;line-height:1.9;color:#4a453e;}
+.badges{display:flex;flex-wrap:wrap;gap:8px;}
+.badge{background:rgba(185,138,62,.12);border:1px solid rgba(185,138,62,.45);color:#7a5c22;
+  font-size:13px;padding:5px 12px;border-radius:20px;letter-spacing:1px;}
+.share-tip{text-align:center;color:var(--mist);font-size:12px;margin-top:26px;line-height:1.9;}
+@media (min-width:700px){ .wrap{max-width:640px;} h1{font-size:32px;} .qtext{font-size:21px;} }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <section id="home" class="page show">
+    <div class="home-title">
+      <div class="seal">魂</div>
+      <h1>测测你的灵魂<br>对应哪位<em>中国历史人物</em></h1>
+      <p class="home-sub">40 道生活化小题 · 10 位历史人物<br>谋士 / 帝王 / 女帝 / 文人 / 侠客 / 诗人 / 将领 / 隐士 / 才女 / 女将<br>看你骨子里藏着谁的影子</p>
+      <button class="btn" onclick="startQuiz()">开 始 测 试</button>
+      <p class="note">本测试为趣味人格测试，非历史考试，亦非专业心理诊断</p>
+    </div>
+  </section>
+
+  <section id="quiz" class="page">
+    <div class="bar-outer">
+      <div class="bar"><div class="bar-in" id="barIn"></div></div>
+      <div class="bar-text" id="barText">0 / 40</div>
+    </div>
+    <div class="qcard">
+      <div class="qnum" id="qnum"></div>
+      <div class="qtext" id="qtext"></div>
+      <div id="opts"></div>
+      <div class="nav-row">
+        <button class="mini" id="prevBtn" onclick="prevQ()">← 上一题</button>
+        <span></span>
+      </div>
+    </div>
+  </section>
+
+  <section id="result" class="page">
+    <div class="result-card" id="rcard"></div>
+    <p class="share-tip">📱 长按 / 截屏保存结果卡，分享到小红书 & 朋友圈<br>考考你的朋友，看看谁是"谪仙"谁是"女帝"</p>
+    <button class="btn ghost" onclick="location.reload()">↺ 再测一次</button>
+  </section>
+
+</div>
+
+<script>
+/* ================= 人物档案（10 位） ================= */
+const TYPES = {
+  MS:{name:"张良",role:"运筹帷幄 · 谋士",
+    line:"你不动声色，却早已把整盘棋看穿。",
+    traits:["冷静缜密","擅长布局","洞察人心","低调不争"],
+    reason:"你习惯先观察再行动，做决定前会把各种可能性在心里过一遍。别人看到的是「你运气好」，其实是你早把路铺好了——这正是谋士最核心的思维方式。",
+    hidden:"混乱中的清醒者：场面越乱，你的脑子反而越清楚，总能找到别人看不见的最优解。",
+    egg:"在群里大家吵翻天时，你表面安静潜水，其实心里已经拟好了三套解决方案，就等一个开口的时机。",
+    badge:["深藏不露","脑内棋盘","稳如老狗"]},
+  DW:{name:"李世民",role:"杀伐决断 · 帝王",
+    line:"天生掌局者——众人还在商量，你已经上路。",
+    traits:["果断自信","大局观强","抗压一流","天生领袖"],
+    reason:"面对选择你几乎不内耗，拍板快、担责快，还总有办法让别人愿意跟你走。这种「我来定」的气场，正是能坐稳江山的人才能有的。",
+    hidden:"危机时刻的定海神针：越是大场面，你越冷静，周围人会不自觉地听你指挥。",
+    egg:"你点外卖从不纠结，三秒下单；朋友选电影吵半天，最后都是你一句「就这个」。",
+    badge:["天选主C","决策零内耗","气场两米八"]},
+  WZ:{name:"武则天",role:"破局登顶 · 女帝",
+    line:"规则挡路时，别人绕行，你改写规则。",
+    traits:["有野心想赢","敢破敢立","手腕高超","越挫越勇"],
+    reason:"你不满足于「被安排好」的位置，在既有规则里也能为自己开出一条路；面对竞争，你敢争、会争、也输得起——这份胆识和手腕，正是从才人到女帝的底气。",
+    hidden:"绝境反击力：越是被质疑、被看低，你越能爆发，把嘲讽当成往上走的燃料。",
+    egg:"开会没叫你？你也会找到理由坐进去，并且十分钟后所有人都在听你讲。",
+    badge:["大女主剧本","规则改写者","姐就是局势"]},
+  WR:{name:"苏轼",role:"烟火人间 · 文人",
+    line:"世界以痛吻你，你却把它炖成一锅红烧肉。",
+    traits:["真诚共情","审美在线","随遇而安","温柔有光"],
+    reason:"你在意身边人的感受，也总能从平淡日子里咂摸出滋味来。被生活捶了不记仇，转头还研究怎么把日子过得更有趣——这是苏轼式的人生哲学。",
+    hidden:"苦中作乐的天赋：别人眼里的倒霉事，到你手里总能变成一段好玩的段子或一顿好饭。",
+    egg:"你的朋友圈永远是长文案配九宫格，骂完加班还要夸一句今晚的月亮真圆。",
+    badge:["人间清醒","情绪美食家","氛围担当"]},
+  XK:{name:"荆轲",role:"一诺千金 · 侠客",
+    line:"别人怕麻烦，你怕对不起朋友。",
+    traits:["重情重义","直来直去","敢作敢当","路见不平"],
+    reason:"你交朋友走心不走利，答应的事从不掉链子，看到不公平的事还会忍不住出头。这种「义」字当先的脾气，就是古侠客的底色。",
+    hidden:"关键时刻的勇气：平时大大咧咧，但真到朋友有难、事情紧急时，你往往是第一个站出来的人。",
+    egg:"朋友搬家你从不缺席，帮忙砍价、陪吵架、深夜接机……你的日程表一半是别人的事。",
+    badge:["义字刻心头","社死我来顶","人间靠谱侠"]},
+  SR:{name:"李白",role:"把日子过成诗 · 诗人",
+    line:"你的快乐无需理由，你的浪漫自带月光。",
+    traits:["想象力爆棚","情绪丰沛","热爱自由","天生浪漫"],
+    reason:"你对世界始终保有好奇心，看到晚霞会驻足，听到好歌会单曲循环一整天。情绪来得浓烈去得也快，活得热气腾腾——这就是谪仙人的底色。",
+    hidden:"点石成金的浪漫：再普通的日常，经过你的眼睛和嘴，都能变成别人羡慕的风景。",
+    egg:"说走就走的旅行冠军：周五晚上突发奇想，周六早上已经坐在去海边的车上了。",
+    badge:["行走的浪漫","灵感永动机","快乐本乐"]},
+  JL:{name:"岳飞",role:"一腔热血 · 将领",
+    line:"认准的事，十头牛也拉不回你。",
+    traits:["责任感爆棚","执行力强","原则坚定","越挫越勇"],
+    reason:"你对自己认定的目标有近乎执拗的坚持，答应的任务一定完成，做人的底线绝不让步。这种铁一般的意志，正是千古名将的精神内核。",
+    hidden:"逆风翻盘体质：别人已经放弃的事，你还能咬牙再撑一段，而胜利往往就藏在那一段里。",
+    egg:"你的健身卡从不吃灰，打卡记录坚持得比恋爱还久，朋友都叫你「自律狂魔」。",
+    badge:["目标钉子户","热血永动机","靠谱天花板"]},
+  YS:{name:"陶渊明",role:"采菊东篱 · 隐士",
+    line:"别人挤破头抢C位，你悄悄坐到了花园里。",
+    traits:["淡泊松弛","精神自洽","亲近自然","不被裹挟"],
+    reason:"你不爱凑热闹，也不太在乎别人怎么看，按自己的节奏生活。当大家都在内卷时，你已经找到了让自己舒服的位置——这是最高级的清醒。",
+    hidden:"精神内耗终结者：你几乎不跟自己较劲，这份松弛感是很多人羡慕一辈子也学不来的。",
+    egg:"你养的植物比别人养得好，周末最大的行程是晒太阳、浇花、发呆，且理直气壮。",
+    badge:["松弛感大师","内卷绝缘体","人间清醒芋"]},
+  QZ:{name:"李清照",role:"千古才女 · 词人",
+    line:"你把心事酿成了酒，把日子写成了词。",
+    traits:["细腻敏锐","真性情","爱憎分明","审美极高"],
+    reason:"你对美和细节有天生第六感，情绪来得真切、表达得动人，还带着一股「不服」的劲——才情与锋芒并存，这正是千古第一才女的底色。",
+    hidden:"点石成金的感受力：同样的日常，你总能看出别人看不见的美；同样的情绪，你总能表达得比别人动人。",
+    egg:"你的备忘录里存满了深夜冒出来的句子，朋友圈文案从来没输过，朋友都找你「代写小作文」。",
+    badge:["文案天花板","人间清醒词","细节控"]},
+  ML:{name:"花木兰",role:"英气飒爽 · 女将",
+    line:"谁说温柔的人不能披甲上阵？你可以。",
+    traits:["外柔内刚","重情重义","责任感强","反差魅力"],
+    reason:"你平时温和随性，但为了在乎的人和事，能瞬间切换成战斗模式。这种平时不显山露水、关键时刻顶得上的担当，正是替父从军的那颗心。",
+    hidden:"关键时刻的爆发力：你的温柔不是软弱，是蓄力——真到需要你的时候，你比谁都硬核。",
+    egg:"平时说话轻声细语，一到保护朋友、撑腰吵架时气场瞬间两米八，朋友都叫你「反差萌战神」。",
+    badge:["反差萌战神","温柔铠甲","关键时刻超硬核"]}
+};
+const KEYS=["MS","DW","WZ","WR","XK","SR","JL","YS","QZ","ML"];
+
+/* ============ 40 道题（选项均为生活化描述，不含人格提示词；10 类各 16 槽已配平） ============ */
+const QS=[
+/* Q1 */["周末早上醒来，你的第一反应是：",[
+"立刻起床，今天要干什么昨晚就定好了|DW",
+"多躺几分钟，在脑子里把今天的事排个顺序|MS",
+"看一眼窗外的天色，心情决定今天怎么过|SR",
+"按平时的点起来，睡懒觉反而不自在|JL"]],
+/* Q2 */["出门旅行前，你通常会：",[
+"热门攻略看不上，专挑别人没走过的路线|WZ",
+"行程精确到几点几分，临时改动会很难受|JL",
+"机票酒店提前搞定，到了就痛痛快快玩|DW",
+"只订一张车票，到了地方再说|YS"]],
+/* Q3 */["同事把你的功劳揽到了自己头上，你会：",[
+"算了，抬头不见低头见|WR",
+"下次汇报前，先把自己的部分留好记录|WZ",
+"无所谓，我本来也不稀罕这些|YS",
+"表面没什么，心里那道坎得缓好几天|QZ"]],
+/* Q4 */["朋友聚会你迟到了半小时：",[
+"一进门先道歉，再自罚讲个自己的糗事|WR",
+"直接说堵车了，散场时主动请客补上|XK",
+"进门前深呼吸，不想把慌乱带给朋友|QZ",
+"到场后默默把后面的招待全包了|ML"]],
+/* Q5 */["突然多出一个完全属于自己的周末，你会：",[
+"约上朋友出去疯玩一天|XK",
+"临时起意，坐上最近一班高铁去邻市|SR",
+"先把攒了一周的家务清完，再安心玩|ML",
+"先盘算一下怎么用这段时间最值|MS"]],
+/* Q6 */["群里为一件小事吵起来了，你会：",[
+"发个表情包把战火降级|SR",
+"直接@双方：「这事我来定」|DW",
+"站出来把事实一条条捋清楚|JL",
+"潜水围观，等吵得差不多了再总结一句|MS"]],
+/* Q7 */["公司要选人牵头一个新项目：",[
+"主动请缨，顺便争取对应的资源和位置|WZ",
+"多一事不如少一事，把手头的做好就行|YS",
+"当仁不让，这种场面就该我来|DW",
+"接了就要负责到底，绝不砸在自己手里|JL"]],
+/* Q8 */["你的社交软件使用习惯更接近：",[
+"特别想说的话，要反复修改很多遍才发出去|QZ",
+"设置了消息免打扰，只在固定时间集中处理|WZ",
+"消息能不回就不回，隔天才想起来|YS",
+"什么群都活跃，评论区永远最热闹|WR"]],
+/* Q9 */["挑选一件衣服时，你更看重：",[
+"设计和质感，细节要经得起看|QZ",
+"耐穿好打理，最好四季都能穿|ML",
+"舒服合身就好，顺手再给闺蜜也带一件|WR",
+"舒适就行，试都不用试|XK"]],
+/* Q10 */["关于记账，你的真实状态是：",[
+"人情往来的那一栏永远记得最清楚|ML",
+"每笔支出分类记录，月底还会复盘|MS",
+"基本不记账，心里有数就行|XK",
+"装过记账App，打开次数一只手数得过来|SR"]],
+/* Q11 */["团队里有人摸鱼拖累了进度，你会：",[
+"不动声色地调整分工，绕开这个环节|MS",
+"私下找他聊聊，看是不是遇到了难处|WR",
+"当面直说，别让干活的人寒心|XK",
+"不关我事，做好自己的部分就行|YS"]],
+/* Q12 */["如果你的人生是一部电影，你想要的海报是：",[
+"骑车追着落日，画面要有大片留白|SR",
+"独自站在高处，脚下是翻涌的云海|WZ",
+"背影比正脸多，身后是家人朋友|ML",
+"站在人群最前面，众星拱月|DW"]],
+/* Q13 */["对「稳定」和「机会」，你的态度是：",[
+"机会来了就抓，稳定从来不是我的优先项|WZ",
+"有吃有喝有朋友，比什么都强|WR",
+"踏实积累，机会来了才接得住|JL",
+"先稳住家里的事，再谈机会|ML"]],
+/* Q14 */["朋友结婚请你帮忙筹备，你会：",[
+"情绪价值担当，全程陪着张罗聊天|WR",
+"重活累活全包，兄弟的事就是我的事|XK",
+"帮点小忙就好，抛头露面的别找我|YS",
+"自然而然成了总指挥，分工拍板一气呵成|DW"]],
+/* Q15 */["深夜刷手机看到特别戳你的内容，你会：",[
+"直接转发给那个一定会懂的朋友|XK",
+"越看越兴奋，恨不得现在就做点什么|SR",
+"反复看很多遍，心里翻起千层浪|QZ",
+"收藏分类，等着以后派上用场|DW"]],
+/* Q16 */["遇到特别喜欢的爱好，你会：",[
+"一头扎进去，生活重心说移就移|SR",
+"定期打卡，几年如一日地练|JL",
+"再忙也挤出时间，绝不半途而废|ML",
+"想玩就玩到精通，不玩出点名堂不罢休|WZ"]],
+/* Q17 */["你认为最值得敬佩的品质是：",[
+"坚持到底，永不放弃|JL",
+"内心丰盈，不被外界绑架|YS",
+"想得远，稳得住|MS",
+"真诚温暖，走到哪都招人喜欢|WR"]],
+/* Q18 */["长假结束前一天，你的状态是：",[
+"把最后一分钟的沙发瘫安排得明明白白|YS",
+"有点惆怅，感慨快乐的日子为什么这么短|QZ",
+"假期最后一天，已经在过工作日的日子了|DW",
+"约朋友出去疯一场，把假期用尽|XK"]],
+/* Q19 */["被长辈或领导当众夸奖，你的内心：",[
+"脸有点红，心里偷偷美了很久|QZ",
+"连连摆手说「是大家一起做的」|ML",
+"微笑接受，心里想的是「下次让你们看到更多」|WZ",
+"顺杆往上爬，当场再讲个更精彩的|SR"]],
+/* Q20 */["面对一段让你消耗的关系，你会：",[
+"再难受也先想着扛一扛、修复它|ML",
+"冷静评估这段关系还值不值得投入|MS",
+"舍不得，会再给对方几次机会|WR",
+"是我的责任我担，触碰底线的绝不将就|JL"]],
+/* Q21 */["排队时有人插队，你会：",[
+"直接出声提醒，理不压人|WZ",
+"观察一下，找工作人员解决比自己开口省事|MS",
+"不敢吭声，但会用眼神持续谴责|QZ",
+"大方提醒一句，语气轻松不伤和气|SR"]],
+/* Q22 */["家里大扫除，你通常是：",[
+"分配任务的那个人|DW",
+"边干活边放歌，气氛担当|WR",
+"角落和死角一个都不放过|JL",
+"话不多，但干得最多的那个|ML"]],
+/* Q23 */["看到别人取得成功，你的真实想法：",[
+"凭什么他行我不行，我也可以做到|WZ",
+"行，够意思，改天让他请客|XK",
+"挺好，与我无关，我的日子也不差|YS",
+"会研究他是怎么做到的，借鉴可复制的部分|MS"]],
+/* Q24 */["你的行李箱里永远塞着：",[
+"给同行人准备的零食和小药包|WR",
+"一本大概率看不完的书|SR",
+"自己的杯子和香薰，出门也要有生活气息|QZ",
+"一套应对临时工作的方案和装备|DW"]],
+/* Q25 */["你的备忘录里最多的是：",[
+"答应过别人的事，怕忘|XK",
+"拆好的长期目标执行清单|JL",
+"家人的生日、体检，要操心的大小日子|ML",
+"收藏的灵感和信息，等时机成熟就启动|WZ"]],
+/* Q26 */["周五晚上，你倾向于：",[
+"夜生活开始，周五的晚上不能浪费|SR",
+"早早洗漱，进入一个人的安静时间|YS",
+"先把下周的重点理一遍，周末过得更清爽|MS",
+"张罗一桌人聚餐，热热闹闹开启周末|WR"]],
+/* Q27 */["同时面对好几件急事，你会：",[
+"一件一件按优先级来，做完一件再碰下一件|JL",
+"容易被某件事带着走，回过神来再补救|QZ",
+"多线并行，脑子切换自如|DW",
+"谁催得急先干谁的|XK"]],
+/* Q28 */["你理想中的居住环境是：",[
+"远离市中心，推窗见绿|YS",
+"离父母家人近，随时能照应|ML",
+"核心地段，通勤和资源都要最好|WZ",
+"老城区有味道的街区，转角就有惊喜|SR"]],
+/* Q29 */["在朋友圈里，你的存在感是：",[
+"不常发，但每条都被人夸「怎么这么会写」|QZ",
+"存在感很低，但一开口就有分量|MS",
+"评论区最热闹的那个，人缘担当|WR",
+"稳定更新，大家都习惯了你的频率|JL"]],
+/* Q30 */["突然获得一周带薪假和一笔旅行基金：",[
+"先看能不能凑上家人的时间，一起出发|ML",
+"当天就定下目的地和行程，效率拉满|DW",
+"约上一帮朋友，人越多越热闹|XK",
+"找个民宿住满七天，哪也不去|YS"]],
+/* Q31 */["你对承诺的态度是：",[
+"答应之前先权衡，答应了就一定办到|MS",
+"承诺就是承诺，说到做到不打折|DW",
+"轻易不许诺，许了就砸锅卖铁也兑现|XK",
+"答应的事记在日程里，到期必交付|JL"]],
+/* Q32 */["在团队中，你更愿意成为：",[
+"掌舵的人，对最终结果负责|DW",
+"有实权和话语权的那个人|WZ",
+"负责灵感和点子的那个人|SR",
+"安静做事、不被打扰的人|YS"]],
+/* Q33 */["你的购物车里躺着最多的是：",[
+"能提升自己能力和竞争力的东西|WZ",
+"吃的，和能分给朋友的东西|WR",
+"长期有用的，比如课程和装备|JL",
+"好看但说不上实用的美物|QZ"]],
+/* Q34 */["遇到必须公事公办、可能得罪人的事：",[
+"原则上不让步，但尽量把话说得让人舒服|WR",
+"该怎样就怎样，得罪就得罪|XK",
+"能躲就躲，这种事别找我|YS",
+"照章办事，事后再私下安抚对方|ML"]],
+/* Q35 */["你的抗挫折能力体现在：",[
+"摔了爬起来接着干，没什么好说的|XK",
+"难过归难过，睡一觉就满血复活|SR",
+"会难受很久，但会记下来慢慢消化|QZ",
+"复盘原因，调整打法再来一次|MS"]],
+/* Q36 */["给别人准备礼物时，你的风格是：",[
+"讲究惊喜感，要看到对方眼睛一亮|SR",
+"实用至上，送上对方正需要的东西|JL",
+"提前很久就留意对方随口提过想要什么|ML",
+"大方干脆，直接问对方要什么省事|DW"]],
+/* Q37 */["关于作息，你的真实状态是：",[
+"几点睡几点起，雷打不动|JL",
+"困了就睡，醒了就起，顺其自然|YS",
+"作息跟着要做的事走，忙有忙的活法|MS",
+"睡得少但精神好，总觉得时间不够用|WZ"]],
+/* Q38 */["看到一部好作品（电影或书）时，你会：",[
+"看完就完，好东西留在心里就好|YS",
+"会为某个片段反复回味，久久放不下|QZ",
+"第一时间想它能用在什么地方|DW",
+"热情安利给所有朋友，恨不得人人去看|WR"]],
+/* Q39 */["你对「规则」的态度是：",[
+"规则要有，但要给「情」留一点缝隙|QZ",
+"守规矩，但规矩不该用来为难人|ML",
+"规则是用来突破的，守旧路走不到前面|WZ",
+"讨厌弯弯绕绕，明规则最舒服|XK"]],
+/* Q40 */["如果给十年后的自己留一句话，你会说：",[
+"再难的日子你都熬过来了，别怕|ML",
+"想清楚再走，你走的每一步都算数|MS",
+"输赢都算数，记得把日子过得有滋味|WR",
+"别丢掉那股说走就走的劲|SR"]]
+];
+
+/* ================= 逻辑 ================= */
+let cur=0;
+let answers=new Array(QS.length).fill(null);
+
+function show(id){
+  document.querySelectorAll(".page").forEach(p=>p.classList.remove("show"));
+  const el=document.getElementById(id);
+  void el.offsetWidth;
+  el.classList.add("show");
+  window.scrollTo(0,0);
+}
+
+function startQuiz(){
+  cur=0;
+  answers=new Array(QS.length).fill(null);
+  show("quiz"); renderQ();
+}
+function renderQ(){
+  const q=QS[cur];
+  document.getElementById("qnum").textContent=`第 ${cur+1} 题 · 共 ${QS.length} 题`;
+  document.getElementById("qtext").textContent=q[0];
+  const box=document.getElementById("opts"); box.innerHTML="";
+  q[1].forEach((o,i)=>{
+    const [txt,key]=o.split("|");
+    const b=document.createElement("button");
+    b.className="opt"+(answers[cur]===key?" sel":"");
+    b.innerHTML=`<span class="tag">${"ABCD"[i]}</span>${txt}`;
+    b.onclick=()=>answer(key);
+    box.appendChild(b);
+  });
+  document.getElementById("prevBtn").disabled=cur===0;
+  document.getElementById("barIn").style.width=Math.round(cur/QS.length*100)+"%";
+  document.getElementById("barText").textContent=`${cur} / ${QS.length}`;
+}
+function answer(key){
+  answers[cur]=key;
+  cur++;
+  if(cur>=QS.length){finish();}else{renderQ();}
+}
+function prevQ(){
+  if(cur===0)return;
+  cur--; renderQ();
+}
+function finish(){
+  // 归一化计分：得分 ÷ 该类型选项出现总次数（10 类各 16 槽，分布完全均衡）
+  const appear={}; KEYS.forEach(k=>appear[k]=0);
+  QS.forEach(q=>q[1].forEach(o=>{appear[o.split("|")[1]]++;}));
+  const score={};
+  KEYS.forEach(k=>score[k]=0);
+  answers.forEach(k=>{if(k)score[k]++;});
+  const ranked=KEYS.map(k=>({k,r:score[k]/Math.max(appear[k],1)}))
+                   .sort((a,b)=>b.r-a.r);
+  showResult(ranked[0].k, ranked[1].k);
+}
+function showResult(main,sub){
+  const t=TYPES[main], s=TYPES[sub];
+  document.getElementById("rcard").innerHTML=`
+    <div class="r-label">— 你的灵魂是 —</div>
+    <div class="r-name">${t.name}</div>
+    <div class="r-role">${t.role}</div>
+    <div class="r-line">「${t.line}」</div>
+    <div class="r-sub">隐藏副人格：<b>${s.name}</b>（${s.role}）</div>
+    <div class="sec"><h3>性格特点</h3><div class="badges">${t.traits.map(x=>`<span class="badge">${x}</span>`).join("")}</div></div>
+    <div class="sec"><h3>匹配理由</h3><p>${t.reason}</p></div>
+    <div class="sec"><h3>隐藏优势</h3><p>${t.hidden}</p></div>
+    <div class="sec"><h3>趣味彩蛋</h3><p>${t.egg}</p></div>
+    <div class="sec"><h3>你的关键词</h3><div class="badges">${t.badge.map(x=>`<span class="badge">#${x}</span>`).join("")}</div></div>
+    <p class="share-tip" style="margin-top:22px">✨ 截屏这张卡片，去考考你的朋友吧 ✨</p>`;
+  show("result");
+}
+/* 键盘快捷键：1-4 选择，← 上一题 */
+document.addEventListener("keydown",e=>{
+  if(document.getElementById("quiz").classList.contains("show")){
+    if(["1","2","3","4"].includes(e.key)){const i=+e.key-1;if(i<QS[cur][1].length)answer(QS[cur][1][i].split("|")[1]);}
+    if(e.key==="ArrowLeft")prevQ();
+  }
+});
+</script>
+</body>
+</html>
